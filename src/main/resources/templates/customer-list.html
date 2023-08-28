@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Customer List</title>
+</head>
+<body>
+    <h2>Customer List</h2>
+    <table>
+        <tr>
+            <th>ID</th>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Street Address</th>
+            <th>Address</th>
+            <th>State</th>
+            <th>Phone</th>
+            <th>City</th>
+            <th>Email</th>
+            <th>Actions</th>
+        </tr>
+        <tr th:each="customer : ${customers}">
+            <td th:text="${customer.id}"></td>
+            <td th:text="${customer.firstname}"></td>
+            <td th:text="${customer.lastname}"></td>
+            <td th:text="${customer.street}"></td>
+            <td th:text="${customer.address}"></td>
+            <td th:text="${customer.state}"></td>
+            <td th:text="${customer.phone}"></td>
+            <td th:text="${customer.city}"></td>
+            <td th:text="${customer.email}"></td>
+            <td>
+                <a th:href="@{/api/customers/{id}(id=${customer.id})}">Edit</a>
+                <a th:href="@{/api/customers/{id}/delete(id=${customer.id})}">Delete</a>
+            </td>
+        </tr>
+    </table>
+    <a th:href="@{/api/customers/new}">Add New Customer</a>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const customerList = document.getElementById("customerList");
+        const createCustomerForm = document.getElementById("createCustomerForm");
+
+       
+        function fetchCustomers() {
+            fetch("https://qa2.sunbasedata.com/sunbase/portal/api/assignment.jsp/customers")
+                .then(response => response.json())
+                .then(customers => {
+                    customerList.innerHTML = "";
+                    customers.forEach(customer => {
+                        const tr = document.createElement("tr");
+                        tr.innerHTML = `
+                            <td>${customer.id}</td>
+                            <td>${customer.firstname}</td>
+                            <td>${customer.lastname}</td>
+                            <td>${customer.street}</td>
+                            <td>${customer.address}</td>
+                            <td>${customer.state}</td>
+                            <td>${customer.phone}</td>
+                            <td>${customer.city}</td>
+                            <td>${customer.email}</td>
+                            <td>
+                                <a href="/api/customers/${customer.id}">Edit</a>
+                                <a href="/api/customers/${customer.id}/delete">Delete</a>
+                            </td>
+                        `;
+                        customerList.appendChild(tr);
+                    });
+                });
+        }
+
+        
+        createCustomerForm.addEventListener("submit", function (event) {
+            event.preventDefault();
+            const formData = new FormData(createCustomerForm);
+
+            const newCustomerData = {
+                firstname: formData.get("firstName"),
+                lastname: formData.get("lastName"),
+                street: formData.get("street"),
+                address: formData.get("address"),
+                state: formData.get("state"),
+                phone: formData.get("phone"),
+                city: formData.get("city"),
+                email: formData.get("email")
+            };
+
+            fetch("https://qa2.sunbasedata.com/sunbase/portal/api/assignment.jsp/customers", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(newCustomerData)
+            })
+            .then(response => response.json())
+            .then(() => {
+                fetchCustomers();
+                createCustomerForm.reset();
+            });
+        });
+
+        // Fetch and display customers when the page loads
+        fetchCustomers();
+    });
+</script>
+</body>
+</html>
+    
+</body>
+</html>

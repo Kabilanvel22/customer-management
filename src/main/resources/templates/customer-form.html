@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Customer Form</title>
+</head>
+<body>
+    <h2>Customer Form</h2>
+    <form id="customerForm">
+        <div>
+            <label for="firstName">First Name:</label>
+            <input type="text" id="firstName" name="firstName">
+        </div>
+        <div>
+            <label for="lastName">Last Name:</label>
+            <input type="text" id="lastName" name="lastName">
+        </div>
+        <div>
+            <label for="street">Street Address:</label>
+            <input type="text" id="street" name="street">
+        </div>
+        <div>
+            <label for="address">Address:</label>
+            <input type="text" id="address" name="address">
+        </div>
+        <div>
+            <label for="state">State:</label>
+            <input type="text" id="state" name="state">
+        </div>
+        <div>
+            <label for="phone">Phone:</label>
+            <input type="text" id="phone" name="phone">
+        </div>
+        <div>
+            <label for="city">City:</label>
+            <input type="text" id="city" name="city">
+        </div>
+        <div>
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email">
+        </div>
+        <button type="submit">Save Customer</button>
+    </form>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const customerForm = document.getElementById("customerForm");
+
+           
+            function fetchCustomers() {
+                fetch("https://qa2.sunbasedata.com/sunbase/portal/api/assignment.jsp/customers")
+                    .then(response => response.json())
+                    .then(customers => {
+                     
+                    });
+            }
+
+            
+            customerForm.addEventListener("submit", function (event) {
+                event.preventDefault();
+                const formData = new FormData(customerForm);
+                const customerId = formData.get("customerId"); // If you have an ID field
+
+                const customerData = {
+                    firstName: formData.get("firstName"),
+                    lastName: formData.get("lastName"),
+                    street: formData.get("street"),
+                    address: formData.get("address"),
+                    state: formData.get("state"),
+                    phone: formData.get("phone"),
+                    city: formData.get("city"),
+                    email: formData.get("email")
+                };
+
+                if (customerId) {
+                   
+                    fetch(`https://qa2.sunbasedata.com/sunbase/portal/api/assignment.jsp/customers/${customerId}` , {
+                        method: "PUT",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify(customerData)
+                    })
+                    .then(() => {
+                        fetchCustomers();
+                        customerForm.reset();
+                    });
+                } else {
+                    
+                    fetch("https://qa2.sunbasedata.com/sunbase/portal/api/assignment.jsp/customers" , {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify(customerData)
+                    })
+                    .then(() => {
+                        fetchCustomers();
+                        customerForm.reset();
+                    });
+                }
+            });
+
+           
+            function deleteCustomer(customerId) {
+                fetch(`https://qa2.sunbasedata.com/sunbase/portal/api/assignment.jsp/customers/${customerId}` , {
+                    method: "DELETE"
+                })
+                .then(() => {
+                    fetchCustomers();
+                });
+            }
+
+           
+            fetchCustomers();
+        });
+    </script>
+</body>
+</html>
